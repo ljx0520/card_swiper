@@ -122,20 +122,36 @@ class ExampleHorizontal extends StatelessWidget {
       appBar: AppBar(
         title: const Text('ExampleHorizontal'),
       ),
-      body: Swiper(
-        itemBuilder: (context, index) {
-          final image = images[index];
-          return Image.asset(
-            image,
-            fit: BoxFit.fill,
-          );
-        },
-        indicatorLayout: PageIndicatorLayout.COLOR,
-        autoplay: true,
-        itemCount: images.length,
-        pagination: const SwiperPagination(),
-        control: const SwiperControl(),
-      ),
+      body: Container(
+          height: MediaQuery.of(context).size.width / 4 * 3 + 30,
+          child: ClipRRect(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+              child: Swiper(
+                outer: true,
+                itemBuilder: (context, index) {
+                  final image = images[index];
+                  return Image.asset(
+                    image,
+                    fit: BoxFit.fill,
+                  );
+                },
+                indicatorLayout: PageIndicatorLayout.COLOR,
+                autoplay: false,
+                itemCount: images.length,
+                pagination: SwiperPagination(
+                    margin: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                    builder: DotSwiperPaginationBuilder(
+                      key: Key(
+                        "1",
+                      ),
+                      activeSize: 8,
+                      size: 7,
+                      color: Colors.grey,
+                      activeColor: Theme.of(context).primaryColor,
+                    )),
+                // control: const SwiperControl(),
+              ))),
     );
   }
 }

@@ -275,11 +275,16 @@ class SwiperPagination extends SwiperPlugin {
 
   final Key? key;
 
+  final Widget? prefixWidget;
+  final Widget? suffixWidget;
+
   const SwiperPagination({
     this.alignment,
     this.key,
     this.margin = const EdgeInsets.all(10.0),
     this.builder = SwiperPagination.dots,
+    this.prefixWidget,
+    this.suffixWidget,
   });
 
   @override
@@ -287,9 +292,20 @@ class SwiperPagination extends SwiperPlugin {
     final defaultAlignment = config.scrollDirection == Axis.horizontal
         ? Alignment.bottomCenter
         : Alignment.centerRight;
-    Widget child = Container(
-      margin: margin,
-      child: builder.build(context, config),
+    Widget child = Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: prefixWidget ?? Container(),
+        ),
+        Container(
+          margin: margin,
+          child: builder.build(context, config),
+        ),
+        Expanded(
+          child: suffixWidget ?? Container(),
+        ),
+      ],
     );
     if (!config.outer!) {
       child = Align(
