@@ -190,6 +190,10 @@ class DotSwiperPaginationBuilder extends SwiperPlugin {
       color = this.color ?? themeData.scaffoldBackgroundColor;
     }
 
+    if (config.itemCount == 1) {
+      return Container();
+    }
+
     if (config.indicatorLayout != PageIndicatorLayout.NONE &&
         config.layout == SwiperLayout.DEFAULT) {
       return PageIndicator(
