@@ -286,6 +286,10 @@ class ScrollingDotSwiperPaginationBuilder extends SwiperPlugin {
       color = this.color ?? themeData.scaffoldBackgroundColor;
     }
 
+    if (config.itemCount == 1) {
+      return Container();
+    }
+
     if (config.indicatorLayout == PageIndicatorLayout.SCROLLING_DOTS) {
       return smoothPage.SmoothPageIndicator(
           controller: config.pageController!,
