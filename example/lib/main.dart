@@ -129,6 +129,7 @@ class ExampleHorizontal extends StatelessWidget {
                   topLeft: Radius.circular(10), topRight: Radius.circular(10)),
               child: Swiper(
                 outer: true,
+                loop: false,
                 itemBuilder: (context, index) {
                   final image = images[index];
                   return Image.asset(
@@ -136,17 +137,18 @@ class ExampleHorizontal extends StatelessWidget {
                     fit: BoxFit.fill,
                   );
                 },
-                indicatorLayout: PageIndicatorLayout.COLOR,
+                indicatorLayout: PageIndicatorLayout.SCROLLING_DOTS,
                 autoplay: false,
                 itemCount: images.length,
                 pagination: SwiperPagination(
                     margin: EdgeInsets.fromLTRB(10, 15, 10, 15),
-                    builder: DotSwiperPaginationBuilder(
+                    builder: ScrollingDotSwiperPaginationBuilder(
                       key: Key(
                         "1",
                       ),
-                      activeSize: 8,
-                      size: 7,
+                      activeSize: 10,
+                      size: 6,
+                      space: 5,
                       color: Colors.grey,
                       activeColor: Theme.of(context).primaryColor,
                     )),

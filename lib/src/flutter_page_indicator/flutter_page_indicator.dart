@@ -87,6 +87,59 @@ class SlidePainter extends BasePainter {
   }
 }
 
+class ColorScalePainter extends BasePainter {
+  ColorScalePainter(PageIndicator widget, double page, int index, Paint paint)
+      : super(widget, page, index, paint);
+
+  @override
+  bool _shouldSkip(int index) {
+    if (this.index == widget.count - 1) {
+      return index == 0 || index == this.index;
+    }
+    return (index == this.index || index == this.index + 1);
+  }
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    _paint.color = widget.color;
+    final space = widget.space;
+    final size = widget.size;
+    final radius = size / 2;
+    final c = widget.count;
+    const maxItemDisplay = 5;
+    for (var i = 0; i < c; ++i) {
+      if (_shouldSkip(i)) {
+        continue;
+      }
+      if (i >= maxItemDisplay) {
+        continue;
+      }
+      canvas.drawCircle(Offset(i * (size + space) + radius, radius),
+          radius * widget.scale, _paint);
+    }
+
+    _paint.color = widget.activeColor;
+    draw(canvas, space, size, radius);
+  }
+
+  @override
+  void draw(Canvas canvas, double space, double size, double radius) {
+    final secondOffset = index == widget.count - 1
+        ? radius
+        : radius + ((index + 1) * (size + space));
+
+    final progress = page - index;
+    _paint.color = Color.lerp(widget.activeColor, widget.color, progress)!;
+    //last
+    canvas.drawCircle(Offset(radius + (index * (size + space)), radius),
+        lerp(radius, radius * widget.scale, progress), _paint);
+    //first
+    _paint.color = Color.lerp(widget.color, widget.activeColor, progress)!;
+    canvas.drawCircle(Offset(secondOffset, radius),
+        lerp(radius * widget.scale, radius, progress), _paint);
+  }
+}
+
 class ScalePainter extends BasePainter {
   ScalePainter(PageIndicator widget, double page, int index, Paint paint)
       : super(widget, page, index, paint);
@@ -303,6 +356,7 @@ enum PageIndicatorLayout {
   WARM,
   COLOR,
   SCALE,
+  SCROLLING_DOTS,
   DROP,
 }
 

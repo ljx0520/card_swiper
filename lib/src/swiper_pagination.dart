@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart' as smoothPage;
 
 import '../card_swiper.dart';
 
@@ -238,6 +239,117 @@ class DotSwiperPaginationBuilder extends SwiperPlugin {
   }
 }
 
+class ScrollingDotSwiperPaginationBuilder extends SwiperPlugin {
+  ///color when current index,if set null , will be Theme.of(context).primaryColor
+  final Color? activeColor;
+
+  ///,if set null , will be Theme.of(context).scaffoldBackgroundColor
+  final Color? color;
+
+  ///Size of the dot when activate
+  final double activeSize;
+
+  ///Size of the dot
+  final double size;
+
+  /// Space between dots
+  final double space;
+
+  final int maxVisibleDots;
+
+  final Key? key;
+
+  const ScrollingDotSwiperPaginationBuilder({
+    this.activeColor,
+    this.color,
+    this.key,
+    this.size = 10.0,
+    this.activeSize = 10.0,
+    this.space = 3.0,
+    this.maxVisibleDots = 5,
+  });
+
+  @override
+  Widget build(BuildContext context, SwiperPluginConfig config) {
+    if (config.itemCount > 20) {
+      log(
+        'The itemCount is too big, we suggest use FractionPaginationBuilder '
+        'instead of DotSwiperPaginationBuilder in this situation',
+      );
+    }
+    var activeColor = this.activeColor;
+    var color = this.color;
+
+    if (activeColor == null || color == null) {
+      final themeData = Theme.of(context);
+      activeColor = this.activeColor ?? themeData.primaryColor;
+      color = this.color ?? themeData.scaffoldBackgroundColor;
+    }
+
+    if (config.indicatorLayout == PageIndicatorLayout.SCROLLING_DOTS) {
+      return smoothPage.SmoothPageIndicator(
+          controller: config.pageController!,
+          count: config.itemCount,
+          effect: smoothPage.ScrollingDotsEffect(
+            dotColor: color,
+            activeDotColor: activeColor,
+            activeDotScale: activeSize / size,
+            maxVisibleDots: maxVisibleDots,
+            spacing: space,
+            dotHeight: size,
+            dotWidth: size,
+          ));
+    }
+
+    if (config.indicatorLayout != PageIndicatorLayout.NONE &&
+        config.layout == SwiperLayout.DEFAULT) {
+      return PageIndicator(
+        count: config.itemCount,
+        controller: config.pageController!,
+        layout: config.indicatorLayout,
+        size: size,
+        activeColor: activeColor,
+        color: color,
+        space: space,
+      );
+    }
+
+    final list = <Widget>[];
+
+    final itemCount = config.itemCount;
+    final activeIndex = config.activeIndex;
+
+    for (var i = 0; i < itemCount; ++i) {
+      final active = i == activeIndex;
+      list.add(Container(
+        key: Key('pagination_$i'),
+        margin: EdgeInsets.all(space),
+        child: ClipOval(
+          child: Container(
+            color: active ? activeColor : color,
+            width: active ? activeSize : size,
+            height: active ? activeSize : size,
+          ),
+        ),
+      ));
+    }
+
+    if (config.scrollDirection == Axis.vertical) {
+      return Column(
+        key: key,
+        mainAxisSize: MainAxisSize.min,
+        children: list,
+      );
+    } else {
+      return Row(
+        key: key,
+        mainAxisSize: MainAxisSize.min,
+        children: list,
+      );
+    }
+  }
+}
+
 typedef SwiperPaginationBuilder = Widget Function(
   BuildContext context,
   SwiperPluginConfig config,
@@ -262,6 +374,8 @@ class SwiperPagination extends SwiperPlugin {
   static const SwiperPlugin fraction = FractionPaginationBuilder();
 
   static const SwiperPlugin rect = RectSwiperPaginationBuilder();
+
+  static const SwiperPlugin dynamicDots = ScrollingDotSwiperPaginationBuilder();
 
   /// Alignment.bottomCenter by default when scrollDirection== Axis.horizontal
   /// Alignment.centerRight by default when scrollDirection== Axis.vertical
